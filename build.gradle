@@ -8,6 +8,10 @@ version '1.0-SNAPSHOT'
 
 ext.springBootWebVersion = '2.4.5'
 
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 repositories {
     mavenLocal()
     jcenter()
