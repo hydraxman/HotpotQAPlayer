@@ -6,7 +6,7 @@ const htmlPlugin = new HtmlWebPackPlugin({
     template: path.join(__dirname, './src/index.html'),
     filename: 'index.html'
 })
-const distPath = '../../src/main/resources/static/dist'
+const distPath = '../src/main/resources/static/dist'
 module.exports = {
     mode: "development",
     output: {
