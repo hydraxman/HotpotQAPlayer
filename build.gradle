@@ -1,0 +1,45 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.4.5'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.0'
+}
+group 'org.example'
+version '1.0-SNAPSHOT'
+
+ext.springBootWebVersion = '2.4.5'
+
+repositories {
+    mavenLocal()
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-web:${springBootWebVersion}") {
+        exclude(module: "spring-boot-starter-tomcat")
+    }
+    implementation("org.springframework.boot:spring-boot-starter-undertow:${springBootWebVersion}")
+
+    //implementation 'org.slf4j:slf4j-api:1.7.29'
+
+    implementation('io.springfox:springfox-swagger2:2.9.2')
+    implementation('io.springfox:springfox-swagger-ui:2.9.2')
+
+    implementation group: 'com.alibaba', name: 'fastjson', version: '1.2.72'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
+
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.4.21'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+
+    compileOnly 'org.projectlombok:lombok:1.18.10'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
