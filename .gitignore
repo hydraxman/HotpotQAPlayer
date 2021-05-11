@@ -3,3 +3,5 @@ build
 *.iml
 .gradle
 ner.json
+
+src/main/resources/static/dist
