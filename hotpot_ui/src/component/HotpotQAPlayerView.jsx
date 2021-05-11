@@ -73,7 +73,7 @@ export default class HotpotQAPlayerView extends React.Component {
             <tbody>
                 <tr>
                     <td>
-                        <TableContainer component={Paper} style={{ width: "292px", height: '780px' }}>
+                        <TableContainer component={Paper} style={{ width: "306px", height: '780px' }}>
                             <Table aria-label="simple table" size="small">
                                 <TableHead>
                                     <TableRow key="title-1">
@@ -180,6 +180,17 @@ export default class HotpotQAPlayerView extends React.Component {
                                     <b>Debug Info</b>
                                 </Typography>
                                 <Typography variant="subtitle1" gutterBottom style={{ fontFamily: '"Times New Roman", Lora, Serif' }}>
+                                    <b>NER data</b>
+                                </Typography>
+                                <ShowMoreText
+                                    lines={5}
+                                    more='Show more'
+                                    less='Show less'
+                                    style={{ fontFamily: '"Times New Roman", Lora, Serif' }}
+                                    expanded={false}>
+                                    <pre>{JSON.stringify(nerObjData, null, 2)}</pre>
+                                </ShowMoreText>
+                                <Typography variant="subtitle1" gutterBottom style={{ fontFamily: '"Times New Roman", Lora, Serif' }}>
                                     <b>Source data</b>
                                 </Typography>
                                 <ShowMoreText
@@ -189,7 +200,6 @@ export default class HotpotQAPlayerView extends React.Component {
                                     style={{ fontFamily: '"Times New Roman", Lora, Serif' }}
                                     expanded={false}>
                                     <pre>{JSON.stringify(caseData, null, 2)}</pre>
-                                    <pre>{JSON.stringify(nerObjData, null, 2)}</pre>
                                 </ShowMoreText>
 
                             </Paper>
