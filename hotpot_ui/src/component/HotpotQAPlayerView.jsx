@@ -2,6 +2,7 @@ import React from 'react'
 
 import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.css'
+import Collapse from '@material-ui/core/Collapse';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -13,6 +14,9 @@ import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import ReactLoading from 'react-loading';
 import _ from 'lodash';
+import IconButton from '@material-ui/core/IconButton';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ShowMoreText from 'react-show-more-text';
 /**
  * Palette
  * https://material-ui.com/customization/palette/
@@ -45,6 +49,7 @@ export default class HotpotQAPlayerView extends React.Component {
 
     render() {
         const caseData = this.state.case
+        const nerObjData = this.state.nerObj
         if (!caseData) {
             return <center><ReactLoading color="#0f52ba" type="bubbles" height={100} width={100} /></center>
         }
@@ -68,7 +73,7 @@ export default class HotpotQAPlayerView extends React.Component {
             <tbody>
                 <tr>
                     <td>
-                        <TableContainer component={Paper} style={{ width: "280px", height: '720px' }}>
+                        <TableContainer component={Paper} style={{ width: "292px", height: '780px' }}>
                             <Table aria-label="simple table" size="small">
                                 <TableHead>
                                     <TableRow key="title-1">
@@ -76,9 +81,10 @@ export default class HotpotQAPlayerView extends React.Component {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {idList.map((idText, index) => <StyledTableRow key={idText} style={index == this.state.selectedIndex ? { backgroundColor: '#62FFDF' } : null} onClick={(e) => { this.clickId(e, idText, index) }}>
-                                        <TableCell>{index + 1}. {idText}</TableCell>
-                                    </StyledTableRow>)}
+                                    {idList.map((idRefObj, index) =>
+                                        <StyledTableRow key={idRefObj.id} style={this.chooseStyle(idRefObj)} onClick={(e) => { this.clickId(e, idRefObj.id, index) }}>
+                                            <TableCell>{index == this.state.selectedIndex ? <b>{"> "}</b> : null}{index + 1}. {idRefObj.id}{index == this.state.selectedIndex ? <b>{" <"}</b> : null}</TableCell>
+                                        </StyledTableRow>)}
                                 </TableBody>
                             </Table>
                         </TableContainer>
@@ -141,18 +147,29 @@ export default class HotpotQAPlayerView extends React.Component {
                                             spIndexPrediction = sTitlesPrediction[title]
                                         }
 
+                                        const content = <Typography variant="body1" gutterBottom style={{ fontFamily: '"Times New Roman", Lora, Serif' }}>
+                                            {contentArr.map((sentence, index) => {
+                                                if (index == spIndex && index == spIndexPrediction) {
+                                                    return <span key={title + index} style={{ backgroundColor: '#20D18B' }}>{sentence}</span>
+                                                }
+                                                return <span key={title + index} style={index == spIndex ? { backgroundColor: '#2dd' } : index == spIndexPrediction ? { backgroundColor: '#CDEC4D' } : null}>{sentence}</span>
+                                            })}
+                                        </Typography>
+
                                         return <div key={title}>
                                             <Typography variant="h6" gutterBottom style={{ fontFamily: '"Times New Roman", Lora, Serif' }}>
                                                 {title}
                                             </Typography>
-                                            <Typography variant="body1" gutterBottom style={{ fontFamily: '"Times New Roman", Lora, Serif' }}>
-                                                {contentArr.map((sentence, index) => {
-                                                    if (index == spIndex && index == spIndexPrediction) {
-                                                        return <span key={title + index} style={{ backgroundColor: '#20D18B' }}>{sentence}</span>
-                                                    }
-                                                    return <span key={title + index} style={index == spIndex ? { backgroundColor: '#2dd' } : index == spIndexPrediction ? { backgroundColor: '#CDEC4D' } : null}>{sentence}</span>
-                                                })}
-                                            </Typography>
+                                            {spIndex == -1 && spIndexPrediction == -1 ?
+                                                <ShowMoreText
+                                                    lines={2}
+                                                    style={{ fontFamily: '"Times New Roman", Lora, Serif' }}
+                                                    more='Show more'
+                                                    less='Show less'
+                                                    expanded={false}>
+                                                    {content}
+                                                </ShowMoreText>
+                                                : content}
                                         </div>
                                     }
                                     )}
@@ -165,7 +182,16 @@ export default class HotpotQAPlayerView extends React.Component {
                                 <Typography variant="subtitle1" gutterBottom style={{ fontFamily: '"Times New Roman", Lora, Serif' }}>
                                     <b>Source data</b>
                                 </Typography>
-                                <pre>{JSON.stringify(caseData, null, 2)}</pre>
+                                <ShowMoreText
+                                    lines={5}
+                                    more='Show more'
+                                    less='Show less'
+                                    style={{ fontFamily: '"Times New Roman", Lora, Serif' }}
+                                    expanded={false}>
+                                    <pre>{JSON.stringify(caseData, null, 2)}</pre>
+                                    <pre>{JSON.stringify(nerObjData, null, 2)}</pre>
+                                </ShowMoreText>
+
                             </Paper>
                         </div>
                     </td>
@@ -183,28 +209,44 @@ export default class HotpotQAPlayerView extends React.Component {
                 this.setState({
                     idList: res.data.content
                 })
-                var firstId = res.data.content[0]
-                axios.get('/mrc/obj/id/' + firstId).then(res => {
+                var firstId = res.data.content[0].id
+                this.loadData(firstId, 0)
+            }
+        }).catch(this.errorHandler)
+    }
+    clickId = (e, id, index) => {
+        this.loadData(id, index)
+    }
+
+    loadData = (id, index) => {
+        axios.get('/mrc/obj/id/' + id).then(res => {
+            if (res.data.code == 200) {
+                const caseObj = res.data.content
+                axios.get('/mrc/ner/obj/id/' + id).then(res => {
                     if (res.data.code == 200) {
                         this.setState({
-                            selectedIndex: 0,
-                            case: res.data.content
+                            selectedIndex: index,
+                            nerObj: res.data.content,
+                            case: caseObj
                         })
                     }
                 }).catch(this.errorHandler)
             }
         }).catch(this.errorHandler)
     }
-    clickId = (e, id, index) => {
-        axios.get('/mrc/obj/id/' + id).then(res => {
-            if (res.data.code == 200) {
-                this.setState({
-                    selectedIndex: index,
-                    case: res.data.content
-                })
-            }
-        }).catch(this.errorHandler)
+
+    chooseStyle = (idRefObj) => {
+        if (idRefObj.jaroWinklerDistance > 0.8) return null
+        if (idRefObj.jaroWinklerDistance > 0.6) return { backgroundColor: '#FAE0C3' }
+        if (idRefObj.jaroWinklerDistance > 0.4) return { backgroundColor: '#FFB0A0' }
+        if (idRefObj.jaroWinklerDistance > 0.2) return { backgroundColor: '#FF726A' }
+        return { backgroundColor: '#FF3C35' }
     }
+
+    handleExpandClick = () => {
+        setExpanded(!expanded);
+    };
+
     errorHandler = (error) => {
         console.log(error)
         if (error.response !== undefined) {

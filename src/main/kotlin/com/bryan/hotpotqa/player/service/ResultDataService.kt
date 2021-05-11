@@ -9,17 +9,24 @@ import org.apache.commons.lang3.StringUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+data class RefInfo(
+        val id: String,
+        val jaroWinklerDistance: Double
+)
+
 @Service
 class ResultDataService {
-    var idList: ArrayList<String> = ArrayList()
+    var idList: ArrayList<RefInfo> = ArrayList()
     var typeList: ArrayList<String> = ArrayList()
     var typePredictionList: ArrayList<Int> = ArrayList()
     private lateinit var devSetArray: JSONArray
+    private lateinit var nerJson: JSONObject
     private var objMap = HashMap<String, JSONObject>()
     private val logger: Logger = LoggerFactory.getLogger(ResultDataService::class.java)
 
     fun initialize() {
         devSetArray = JSON.parseArray(File("hotpot_dev_distractor_v1.json").readText())
+        nerJson = JSON.parseObject(File("ner.json").readText())
         val predictJson = JSON.parseObject(File("pred.json").readText())
 
         val answerObj = predictJson.getJSONObject("answer")
@@ -30,7 +37,6 @@ class ResultDataService {
         for (i in 0 until devSetArray.size) {
             val jsonObject = devSetArray.getJSONObject(i)
             val id = jsonObject["_id"].toString()
-            idList.add(id)
 
             val type = jsonObject["type"].toString()
             if (!typeList.contains(type)) {
@@ -40,7 +46,9 @@ class ResultDataService {
             val predicted = answerObj[id].toString().trim()
             val providedAnswer = jsonObject["answer"].toString().trim()
 
-            jsonObject["similarity"] = StringUtils.getJaroWinklerDistance(predicted, providedAnswer)
+            val jaroWinklerDistance = StringUtils.getJaroWinklerDistance(predicted, providedAnswer)
+            jsonObject["similarity"] = jaroWinklerDistance
+            idList.add(RefInfo(id, jaroWinklerDistance))
             jsonObject["answer_prediction"] = predicted
             jsonObject["supporting_facts_in_prediction"] = supporting[id]
 
@@ -62,6 +70,10 @@ class ResultDataService {
 
     fun getObjById(id: String): JSONObject? {
         return objMap[id]
+    }
+
+    fun getNerObjById(id: String): JSONObject? {
+        return nerJson.getJSONObject(id)
     }
 
     fun getObjByIndex(index: Int): JSONObject? {

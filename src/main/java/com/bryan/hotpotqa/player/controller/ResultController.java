@@ -32,6 +32,11 @@ public class ResultController {
         return Result.ok(resultDataService.getObjById(id));
     }
 
+    @GetMapping("/mrc/ner/obj/id/{id}")
+    public Result getNerObjById(@PathVariable("id") String id) {
+        return Result.ok(resultDataService.getNerObjById(id));
+    }
+
     @GetMapping("/mrc/obj/index/{index}")
     public Result getByIndex(@PathVariable("index") int index) {
         return Result.ok(resultDataService.getObjByIndex(index));
