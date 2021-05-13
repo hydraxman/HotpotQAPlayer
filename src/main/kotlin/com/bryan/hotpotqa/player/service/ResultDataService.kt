@@ -14,10 +14,17 @@ data class RefInfo(
         val jaroWinklerDistance: Double
 )
 
+data class TagInfo(
+        val id: String,
+        val tag: String
+)
+
 @Service
 class ResultDataService {
     var idList: ArrayList<RefInfo> = ArrayList()
     var idNoNerList: ArrayList<RefInfo> = ArrayList()
+    var levelTagList: ArrayList<TagInfo> = ArrayList()
+    var typeTagList: ArrayList<TagInfo> = ArrayList()
     var typeList: ArrayList<String> = ArrayList()
     var typePredictionList: ArrayList<Int> = ArrayList()
     private lateinit var devSetArray: JSONArray
@@ -40,9 +47,12 @@ class ResultDataService {
             val id = jsonObject["_id"].toString()
 
             val type = jsonObject["type"].toString()
+            val level = jsonObject["level"].toString()
             if (!typeList.contains(type)) {
                 typeList.add(type)
             }
+            levelTagList.add(TagInfo(id, level))
+            typeTagList.add(TagInfo(id, type))
 
             val predicted = answerObj[id].toString().trim()
             val providedAnswer = jsonObject["answer"].toString().trim()

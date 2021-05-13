@@ -27,6 +27,16 @@ public class ResultController {
         return Result.ok(resultDataService.getTypeList());
     }
 
+    @GetMapping("/mrc/id/type/list")
+    public Result typeIdList() {
+        return Result.ok(resultDataService.getTypeTagList());
+    }
+
+    @GetMapping("/mrc/id/level/list")
+    public Result levelIdList() {
+        return Result.ok(resultDataService.getLevelTagList());
+    }
+
     @GetMapping("/mrc/type/predict/list")
     public Result typePredList() {
         return Result.ok(resultDataService.getTypePredictionList());
