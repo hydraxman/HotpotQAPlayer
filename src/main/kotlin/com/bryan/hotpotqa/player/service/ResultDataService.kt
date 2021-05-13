@@ -17,6 +17,7 @@ data class RefInfo(
 @Service
 class ResultDataService {
     var idList: ArrayList<RefInfo> = ArrayList()
+    var idNoNerList: ArrayList<RefInfo> = ArrayList()
     var typeList: ArrayList<String> = ArrayList()
     var typePredictionList: ArrayList<Int> = ArrayList()
     private lateinit var devSetArray: JSONArray
@@ -56,6 +57,10 @@ class ResultDataService {
 
             val typePred = typePredict.getIntValue(id)
             jsonObject["type_prediction"] = typePred
+
+            if (nerJson.getJSONObject(id) == null) {
+                idNoNerList.add(RefInfo(id, jaroWinklerDistance))
+            }
 
             if (!typePredictionList.contains(typePred)) {
                 typePredictionList.add(typePred)

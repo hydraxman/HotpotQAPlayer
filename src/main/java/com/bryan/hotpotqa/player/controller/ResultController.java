@@ -17,6 +17,11 @@ public class ResultController {
         return Result.ok(resultDataService.getIdList());
     }
 
+    @GetMapping("/mrc/noNer/id/list")
+    public Result noNERList() {
+        return Result.ok(resultDataService.getIdNoNerList());
+    }
+
     @GetMapping("/mrc/type/list")
     public Result typeList() {
         return Result.ok(resultDataService.getTypeList());

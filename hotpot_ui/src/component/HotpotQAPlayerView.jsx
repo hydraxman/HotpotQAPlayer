@@ -2,7 +2,6 @@ import React from 'react'
 
 import axios from 'axios'
 import 'bootstrap/dist/css/bootstrap.css'
-import Collapse from '@material-ui/core/Collapse';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -14,8 +13,6 @@ import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import ReactLoading from 'react-loading';
 import _ from 'lodash';
-import IconButton from '@material-ui/core/IconButton';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ShowMoreText from 'react-show-more-text';
 /**
  * Palette
@@ -162,7 +159,7 @@ export default class HotpotQAPlayerView extends React.Component {
                                             </Typography>
                                             {spIndex == -1 && spIndexPrediction == -1 ?
                                                 <ShowMoreText
-                                                    lines={2}
+                                                    lines={1}
                                                     style={{ fontFamily: '"Times New Roman", Lora, Serif' }}
                                                     more='Show more'
                                                     less='Show less'
