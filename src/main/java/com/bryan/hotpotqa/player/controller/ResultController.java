@@ -61,10 +61,10 @@ public class ResultController {
         return Result.ok(resultDataService.getObjByIndex(index));
     }
 
-    @GetMapping("/test/env")
-    public Result testEnv() {
-        Result ok = Result.ok(System.getenv());
-        ok.setMessage(envUrl);
-        return ok;
-    }
+//    @GetMapping("/test/env")
+//    public Result testEnv() {
+//        Result ok = Result.ok(System.getenv());
+//        ok.setMessage(envUrl);
+//        return ok;
+//    }
 }
