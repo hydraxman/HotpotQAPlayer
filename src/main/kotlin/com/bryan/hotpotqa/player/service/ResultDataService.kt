@@ -34,7 +34,12 @@ class ResultDataService {
 
     fun initialize() {
         devSetArray = JSON.parseArray(File("hotpot_dev_distractor_v1.json").readText())
-        nerJson = JSON.parseObject(File("ner.json").readText())
+        val file = File("ner.json")
+        nerJson = if (file.exists()) {
+            JSON.parseObject(file.readText())
+        } else {
+            JSONObject()
+        }
         val predictJson = JSON.parseObject(File("pred.json").readText())
 
         val answerObj = predictJson.getJSONObject("answer")

@@ -5,3 +5,5 @@ build
 ner.json
 
 src/main/resources/static/dist
+
+local.rc

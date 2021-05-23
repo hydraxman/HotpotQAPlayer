@@ -1,2 +1,5 @@
 server:
   port: 9876
+
+app:
+  test: ${DB_NAME:@null}
