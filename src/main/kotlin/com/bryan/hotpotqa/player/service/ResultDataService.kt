@@ -11,7 +11,9 @@ import org.slf4j.LoggerFactory
 
 data class RefInfo(
         val id: String,
-        val jaroWinklerDistance: Double
+        val jaroWinklerDistance: Double,
+        val numberInvolved: Boolean,
+        val predictionIncluded: Boolean
 )
 
 data class TagInfo(
@@ -64,7 +66,6 @@ class ResultDataService {
 
             val jaroWinklerDistance = StringUtils.getJaroWinklerDistance(predicted, providedAnswer)
             jsonObject["similarity"] = jaroWinklerDistance
-            idList.add(RefInfo(id, jaroWinklerDistance))
             jsonObject["answer_prediction"] = predicted
             jsonObject["supporting_facts_in_prediction"] = supporting[id]
 
@@ -72,9 +73,15 @@ class ResultDataService {
 
             val typePred = typePredict.getIntValue(id)
             jsonObject["type_prediction"] = typePred
+            val question = jsonObject["question"].toString()
 
+            var numRelated = containsNumber(question) || containsNumber(providedAnswer)
+            jsonObject["number_related"] = numRelated
+            jsonObject["prediction_included"] = predicted.contains(providedAnswer)
+
+            idList.add(RefInfo(id, jaroWinklerDistance, numRelated, predicted.contains(providedAnswer)))
             if (nerJson.getJSONObject(id) == null) {
-                idNoNerList.add(RefInfo(id, jaroWinklerDistance))
+                idNoNerList.add(RefInfo(id, jaroWinklerDistance, numRelated, predicted.contains(providedAnswer)))
             }
 
             if (!typePredictionList.contains(typePred)) {
@@ -86,6 +93,11 @@ class ResultDataService {
 
         logger.info("init finished")
 
+    }
+
+    fun containsNumber(question: String): Boolean {
+        return question.contains(Regex("\\d+"))
+                || question.contains(Regex("first|second|third|forth|fifth"))
     }
 
     fun getObjById(id: String): JSONObject? {

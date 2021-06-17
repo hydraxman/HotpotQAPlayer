@@ -36,14 +36,14 @@ const StyledTableRow = withStyles((theme) => ({
         },
     },
 }))(TableRow);
-const PieCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
-    const radius = innerRadius + (outerRadius - innerRadius) * 0.3;
+const PieCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, value, name, index }) => {
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.35;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
     return (
-        <text x={x} y={y} fill="white" fontSize={10} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
-            {`${(percent * 100).toFixed(1)}%`}
+        <text x={x} y={y} fill="black" fontSize={10} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+            {`${name}-${(percent * 100).toFixed(1)}%`}
         </text>
     );
 };
@@ -62,7 +62,6 @@ export default class HotpotQAPlayerView extends React.Component {
         if (!caseData) {
             return <center><ReactLoading color="#0f52ba" type="bubbles" height={100} width={100} /></center>
         }
-        const idLevelList = this.state.idLevelList
         const idTypeList = this.state.idTypeList
         const idList = this.state.idList
 
@@ -79,24 +78,29 @@ export default class HotpotQAPlayerView extends React.Component {
         supportingFactsPrediction.forEach(fact => {
             sTitlesPrediction[fact[0]] = fact[1]
         })
-        const overallPieSize = 180
+        const overallPieSize = 240
 
         const sumType = _.countBy(idTypeList, 'tag')
         const chartDataType = _.keys(sumType).map((k) => { return { 'name': k, 'value': sumType[k] } })
 
-        const sumLevel = _.countBy(idLevelList, 'tag')
-        const chartDataLevel = _.keys(sumLevel).map((k) => { return { 'name': k, 'value': sumLevel[k] } })
+        const sumNumberDist = _.countBy(idList, function (e) {
+            if (e.numberInvolved) {
+                return 'NumberAppeared'
+            }
+            return "NoNumber"
+        })
+        const chartNumberDataDist = _.keys(sumNumberDist).map((k) => { return { 'name': k, 'value': sumNumberDist[k] } })
 
         const sumDist = _.countBy(idList, function (e) {
             const j = e.jaroWinklerDistance
             if (j >= 1) {
                 return 'identical'
             }
-            if (j >= 0.7) {
-                return 'similar'
+            if (e.predictionIncluded) {
+                return 'partial'
             }
             if (j >= 0.3) {
-                return 'partial'
+                return 'similar'
             }
             if (j >= 0.1) {
                 return 'mismatch'
@@ -129,11 +133,11 @@ export default class HotpotQAPlayerView extends React.Component {
                                     <td>
                                         <PieChart width={overallPieSize} height={overallPieSize}>
                                             <Pie
-                                                data={chartDataLevel}
+                                                data={chartNumberDataDist}
                                                 labelLine={false}
                                                 label={PieCustomizedLabel}
                                                 dataKey='value'>
-                                                {chartDataLevel.map((entry, index) => (
+                                                {chartNumberDataDist.map((entry, index) => (
                                                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                                                 ))}
                                             </Pie>
